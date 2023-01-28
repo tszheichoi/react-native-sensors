@@ -111,15 +111,14 @@ RCT_EXPORT_METHOD(startUpdates) {
         NSLog(@"startUpdates/startMagnetometerUpdates");
     }
 
-    [self->_motionManager startMagnetometerUpdates];
-
     /* Receive the magnetometer data on this block */
-    [self->_motionManager startMagnetometerUpdatesToQueue:[NSOperationQueue mainQueue]
-                                               withHandler:^(CMMagnetometerData *magnetometerData, NSError *error)
+    [self->_motionManager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXTrueNorthZVertical
+                                                              toQueue:[NSOperationQueue mainQueue]
+                                                          withHandler:^(CMDeviceMotion *magnetometerData, NSError *error)
      {
-         double x = magnetometerData.magneticField.x;
-         double y = magnetometerData.magneticField.y;
-         double z = magnetometerData.magneticField.z;
+         double x = magnetometerData.magneticField.field.x;
+         double y = magnetometerData.magneticField.field.y;
+         double z = magnetometerData.magneticField.field.z;
          double timestamp = [RNSensorsUtils sensorTimestampToEpochMilliseconds:magnetometerData.timestamp];
 
          if (self->logLevel > 1) {
@@ -141,7 +140,8 @@ RCT_EXPORT_METHOD(stopUpdates) {
         NSLog(@"stopUpdates");
     }
 
-    [self->_motionManager stopMagnetometerUpdates];
+    [self->_motionManager stopDeviceMotionUpdates];
+    
 }
 
 @end
